@@ -2,37 +2,28 @@
 
     require_once "_Varios.php";
 
-    // Comprobamos si hay sesión-usuario iniciada.
-    //   - Si la hay, no intervenimos. Dejamos que la pág se cargue.
-    //     (Mostrar info del usuario logueado y tal...)
-    //   - Si NO la hay, redirigimos a SesionInicioFormulario.php
-
     if (!haySesionRamIniciada() && !intentarCanjearSesionCookie()) {
         redireccionar("SesionInicioFormulario.php");
     }
 
 ?>
 
-
-
 <html>
 
-<head>
-    <meta charset='UTF-8'>
-</head>
+    <head>
+        <meta charset='UTF-8'>
+    </head>
 
+    <body>
 
+        <?php pintarInfoSesion(); ?>
 
-<body>
+        <h1>Muro global</h1>
 
-<?php pintarInfoSesion(); ?>
+        <p>Aquí mostraremos todos los mensajes de todos a todos.</p>
 
-<h1>Muro global</h1>
+        <a href='MuroVerDe.php'>Ir a mi muro.</a>
 
-<p>Aquí mostraremos todos los mensajes de todos a todos.</p>
-
-<a href='MuroVerDe.php'>Ir a mi muro.</a>
-
-</body>
+    </body>
 
 </html>

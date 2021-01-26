@@ -15,3 +15,5 @@ if ($arrayUsuario) { // Identificador existía y contraseña era correcta.
 } else {
     redireccionar("SesionInicioFormulario.php?datosErroneos");
 }
+
+?>

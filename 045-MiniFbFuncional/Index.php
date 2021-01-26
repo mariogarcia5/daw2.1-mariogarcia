@@ -1,31 +1,25 @@
 <?php
-
     require_once "_Varios.php";
-
 ?>
-
-
 
 <html>
 
-<head>
-    <meta charset='UTF-8'>
-</head>
+    <head>
+        <meta charset='UTF-8'>
+    </head>
 
+    <body>
 
+        <?php pintarInfoSesion(); ?>
 
-<body>
+        <h1>MiniFb</h1>
 
-<?php pintarInfoSesion(); ?>
+        <p>¡Bienvenido al MiniFb!</p>
+        <p>Esto es una red social en la que puedes interactuar con tus familiares y amigos.</p>
+        <p>Crea tu cuenta y empieza a socializar.</p>
 
-<h1>MiniFb</h1>
+        <a href='MuroVerGlobal.php'>Si ya tienes una cuenta, puedes mirar el muro global.</a>
 
-<p>¡Bienvenido al MiniFb!</p>
-<p>Esto es una red social en la que bla, bla, bla, bla.</p>
-<p>Crea tu cuenta y participa.</p>
-
-<a href='MuroVerGlobal.php'>Mira el muro global si ya tienes una cuenta.</a>
-
-</body>
+    </body>
 
 </html>

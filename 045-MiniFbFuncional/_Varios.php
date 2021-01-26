@@ -10,16 +10,16 @@ function obtenerPdoConexionBD(): PDO
     $identificador = "root";
     $contrasenna = "";
     $opciones = [
-        PDO::ATTR_EMULATE_PREPARES   => false, // turn off emulation mode for "real" prepared statements
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, //turn on errors in the form of exceptions
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, //make the default fetch be an associative array
+        PDO::ATTR_EMULATE_PREPARES   => false,
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ];
 
     try {
         $conexion = new PDO("mysql:host=$servidor;dbname=$bd;charset=utf8", $identificador, $contrasenna, $opciones);
     } catch (Exception $e) {
-        error_log("Error al conectar: " . $e->getMessage()); // El error se vuelca a php_error.log
-        exit('Error al conectar'); //something a user can understand
+        error_log("Error al conectar: " . $e->getMessage());
+        exit('Error al conectar');
     }
 
     return $conexion;
@@ -34,7 +34,6 @@ function obtenerUsuarioPorContrasenna(string $identificador, string $contrasenna
     $select->execute([$identificador, $contrasenna]);
     $rs = $select->fetchAll();
 
-    // $rs[0] es la primera (y esperemos que única) fila que ha podido venir. Es un array asociativo.
     return $select->rowCount()==1 ? $rs[0] : null;
 }
 
@@ -47,7 +46,6 @@ function obtenerUsuarioPorCodigoCookie(string $identificador, string $codigoCook
     $select->execute([$identificador, $codigoCookie]);
     $rs = $select->fetchAll();
 
-    // $rs[0] es la primera (y esperemos que única) fila que ha podido venir. Es un array asociativo.
     return $select->rowCount()==1 ? $rs[0] : null;
 }
 
@@ -56,17 +54,14 @@ function actualizarCodigoCookieEnBD(?string $codigoCookie)
     $conexion = obtenerPdoConexionBD();
     $sql = "UPDATE Usuario SET codigoCookie=? WHERE id=?";
     $sentencia = $conexion->prepare($sql);
-    $sentencia->execute([$codigoCookie, $_SESSION["id"]]); // TODO Comprobar si va bien con null.
+    $sentencia->execute([$codigoCookie, $_SESSION["id"]]);
 
-    // TODO Para una seguridad óptima convendría anotar en la BD la fecha de caducidad de la cookie y no aceptar ninguna cookie pasada dicha fecha.
 }
 
 function establecerSesionRam(array $arrayUsuario)
 {
-    // Anotar en el post-it como mínimo el id.
     $_SESSION["id"] = $arrayUsuario["id"];
 
-    // Además, podemos anotar todos los datos que podamos querer tener a mano, sabiendo que pueden quedar obsoletos...
     $_SESSION["identificador"] = $arrayUsuario["identificador"];
     $_SESSION["tipoUsuario"] = $arrayUsuario["tipoUsuario"];
     $_SESSION["nombre"] = $arrayUsuario["nombre"];
@@ -75,14 +70,13 @@ function establecerSesionRam(array $arrayUsuario)
 
 function haySesionRamIniciada(): bool
 {
-    // Está iniciada si isset($_SESSION["id"])
     return isset($_SESSION["id"]);
 }
 
 function borrarCookies()
 {
-    setcookie("identificador", "", time() - 3600); // Tiempo en el pasado, para (pedir) borrar la cookie.
-    setcookie("codigoCookie", "", time() - 3600); // Tiempo en el pasado, para (pedir) borrar la cookie.}
+    setcookie("identificador", "", time() - 3600);
+    setcookie("codigoCookie", "", time() - 3600);
 }
 
 function generarCadenaAleatoria(int $longitud): string
@@ -98,14 +92,14 @@ function intentarCanjearSesionCookie(): bool
 
         if ($arrayUsuario) {
             establecerSesionRam($arrayUsuario);
-            establecerSesionCookie($arrayUsuario); // Para re-generar el numerito.
+            establecerSesionCookie($arrayUsuario);
             return true;
-        } else { // Venían cookies pero los datos no estaban bien.
-            borrarCookies(); // Las borramos para evitar problemas.
+        } else {
+            borrarCookies();
             return false;
         }
-    } else { // No vienen ambas cookies.
-        borrarCookies(); // Las borramos por si venía solo una de ellas, para evitar problemas.
+    } else {
+        borrarCookies();
         return false;
     }
 }
@@ -120,12 +114,10 @@ function pintarInfoSesion() {
 
 function establecerSesionCookie(array $arrayUsuario)
 {
-    // Creamos un código cookie muy complejo (no necesariamente único).
-    $codigoCookie = generarCadenaAleatoria(32); // Random...
+    $codigoCookie = generarCadenaAleatoria(32);
 
     actualizarCodigoCookieEnBD($codigoCookie);
 
-    // Enviamos al cliente, en forma de cookies, el identificador y el codigoCookie:
     setcookie("identificador", $arrayUsuario["identificador"], time() + 600);
     setcookie("codigoCookie", $codigoCookie, time() + 600);
 }
@@ -135,11 +127,9 @@ function destruirSesionRamYCookie()
     session_destroy();
     actualizarCodigoCookieEnBD(Null);
     borrarCookies();
-    unset($_SESSION); // Por si acaso
+    unset($_SESSION);
 }
 
-// (Esta función no se utiliza en este proyecto pero se deja por si se optimizase el flujo de navegación.)
-// Esta función redirige a otra página y deja de ejecutar el PHP que la llamó:
 function redireccionar(string $url)
 {
     header("Location: $url");
